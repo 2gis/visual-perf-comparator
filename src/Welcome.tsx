@@ -201,7 +201,6 @@ function Welcome({
         <button
           className="welcome-button"
           onClick={handleSubmit}
-          disabled={!apiKey.trim()}
         >
           Начать работу
         </button>
