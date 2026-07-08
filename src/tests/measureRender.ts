@@ -47,7 +47,6 @@ export async function measureRender(
   let frameStart = NaN
   let timelineInterval: ReturnType<typeof setInterval> | null = null
   let currentSecondFpsCount = 0
-  let lastFrameTime = performance.now()
 
   const onFrameStart = () => {
     frameStart = performance.now()
@@ -69,8 +68,6 @@ export async function measureRender(
       results.tiles.push(mapStats.tileCount ?? 0)
       results.vertices.push((mapStats.vertexCount ?? 0) / 10 ** 6)
     }
-
-    lastFrameTime = currentTime
   }
 
   impl.on('framestart', onFrameStart)

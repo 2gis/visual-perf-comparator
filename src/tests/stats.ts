@@ -1,6 +1,4 @@
 const asc = (arr: number[]) => arr.sort((a, b) => a - b)
-const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0)
-const mean = (arr: number[]) => sum(arr) / arr.length
 
 const quantile = (sorted: number[], q: number) => {
   const pos = (sorted.length - 1) * q
