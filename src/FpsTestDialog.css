@@ -1,0 +1,142 @@
+.fps-test-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+}
+
+.fps-test-window {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 36px 44px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  min-width: 380px;
+  max-width: 480px;
+}
+
+.fps-test-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #08060d;
+}
+
+.fps-test-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #6b6375;
+}
+
+.fps-test-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fps-test-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #08060d;
+}
+
+.fps-test-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.fps-test-checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #aa3bff;
+  cursor: pointer;
+}
+
+.fps-test-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  color: #08060d;
+  background: #f4f3ec;
+  border: 2px solid #e5e4e7;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.fps-test-input:focus {
+  border-color: #aa3bff;
+  background: #fff;
+}
+
+.fps-test-select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #08060d;
+  background: #f4f3ec;
+  border: 2px solid #e5e4e7;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236b6375'><path d='M4 6l4 4 4-4'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  padding-right: 36px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.fps-test-select:focus {
+  border-color: #aa3bff;
+  background: #fff;
+}
+
+.fps-test-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.fps-test-btn {
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.fps-test-btn.cancel {
+  background: #e5e4e7;
+  color: #6b6375;
+}
+
+.fps-test-btn.cancel:hover {
+  background: #d4d3d7;
+}
+
+.fps-test-btn.start {
+  background: #aa3bff;
+  color: #fff;
+}
+
+.fps-test-btn.start:hover {
+  background: #8a2ce0;
+}

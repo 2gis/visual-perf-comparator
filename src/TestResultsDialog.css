@@ -1,0 +1,124 @@
+.results-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1200;
+}
+
+.results-window {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px 40px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  min-width: 500px;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.results-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #08060d;
+}
+
+.results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.results-section-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #6b6375;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-family: var(--mono, ui-monospace, Consolas, monospace);
+}
+
+.results-table th {
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b6375;
+  border-bottom: 2px solid #e5e4e7;
+}
+
+.results-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.results-table tr:last-child td {
+  border-bottom: none;
+}
+
+.results-single-row {
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+  font-family: var(--mono, ui-monospace, Consolas, monospace);
+}
+
+.results-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.results-btn {
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background: #aa3bff;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease;
+}
+
+.results-btn:hover {
+  background: #8a2ce0;
+}
+
+.results-btn.copy {
+  background: #3498db;
+}
+
+.results-btn.copy:hover {
+  background: #2980b9;
+}
+
+.timeline-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.timeline-legend {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: #666;
+}
