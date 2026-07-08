@@ -21,11 +21,12 @@ interface MapProps {
   styleId?: string
   onReady?: () => void
 }
+const key = import.meta.env.VITE_MAPGL_KEY;
 
 const Map = forwardRef<MapHandle, MapProps>(
   (
     {
-      apiKey = 'YOUR_2GIS_API_KEY',
+      apiKey = key || 'YOUR_2GIS_API_KEY',
       options = DEFAULT_MAP_OPTIONS,
       engineUrl,
       onReady,
