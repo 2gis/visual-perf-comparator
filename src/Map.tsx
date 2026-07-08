@@ -25,7 +25,7 @@ interface MapProps {
 const Map = forwardRef<MapHandle, MapProps>(
   (
     {
-      apiKey = 'a1893935-6834-4445-b97a-3405fb426c5b',
+      apiKey =  '',
       options = DEFAULT_MAP_OPTIONS,
       engineUrl,
       onReady,
@@ -59,7 +59,7 @@ const Map = forwardRef<MapHandle, MapProps>(
 
         const map = new mapglAPI.Map(containerRef.current, {
           ...mergedOptions,
-          key: apiKey,
+          key: apiKey || 'a1893935-6834-4445-b97a-3405fb426c5b',
         } as ConstructorParameters<typeof mapglAPI.Map>[1])
         mapInstanceRef.current = map
 
