@@ -101,7 +101,7 @@ export async function measureRender(
       currentSecondFpsCount = 0
     }, 1000)
 
-    await runScenario(map, scenario, isWarmup ? 3 : speedMultiplier)
+    await runScenario(map, scenario, isWarmup ? 2 : speedMultiplier)
 
     // Останавливаем таймер таймлайна
     if (timelineInterval) {

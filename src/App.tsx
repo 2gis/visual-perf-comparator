@@ -9,6 +9,51 @@ import TestResultsDialog, { type TestMeta } from './TestResultsDialog'
 import { measureRender, type TestResults } from './tests/measureRender'
 import { DEFAULT_STYLE_ID, STORAGE_KEYS } from './constants'
 
+interface LocationPreset {
+  label: string
+  center: [number, number]
+  zoom?: number
+  pitch?: number
+  rotation?: number
+}
+
+const LOCATIONS: LocationPreset[] = [
+  {
+    label: 'ВДНХ - вход',
+    center: [37.63760896115528, 55.82633369374944],
+    pitch: 66,
+    rotation: 40.8,
+    zoom: 18.7,
+  },
+  {
+    label: 'ВДНХ - канатка',
+    center: [37.627627325649094, 55.829703990749145],
+    pitch: 64,
+    zoom: 18.9,
+    rotation: 1,
+  },
+  {
+    label: 'ВДНХ - ракета',
+    center: [37.62297572561757, 55.83425861753578],
+    pitch: 65,
+    zoom: 18.9,
+    rotation: 48.7,
+  },
+  {
+    label: 'Сочи - парк',
+    center: [39.963559768455305, 43.4047978051997],
+    pitch: 65,
+    zoom: 18.9,
+    rotation: -77,
+  }, {
+    label: 'Новосибирск - колесо',
+    center: [82.93896066965088, 55.005952814414606],
+    pitch: 70,
+    zoom: 19.1,
+    rotation: 27.3,
+  },
+]
+
 interface MapOptions {
   center?: [number, number]
   zoom?: number
@@ -100,6 +145,8 @@ function App() {
   }>({ left: null, right: null })
   const [testMeta, setTestMeta] = useState<TestMeta | null>(null)
   const [showResults, setShowResults] = useState(false)
+  const [locationOpen, setLocationOpen] = useState(false)
+  const locationRef = useRef<HTMLDivElement>(null)
   const prevMode = useRef<Mode>('side-by-side')
 
   const leftMapRef = useRef<MapHandle>(null)
@@ -320,6 +367,36 @@ function App() {
     }
   }
 
+  const handleLocationSelect = (loc: LocationPreset) => {
+    const leftMap = leftMapRef.current?.getMap()
+    const rightMap = rightMapRef.current?.getMap()
+
+    if (leftMap) {
+      leftMap.setCenter(loc.center, { animate: true } as never)
+      if (loc.zoom !== undefined) leftMap.setZoom(loc.zoom, { animate: true } as never)
+      if (loc.pitch !== undefined) leftMap.setPitch(loc.pitch, { animate: true } as never)
+      if (loc.rotation !== undefined) leftMap.setRotation(loc.rotation, { animate: true } as never)
+    }
+    if (rightMap) {
+      rightMap.setCenter(loc.center, { animate: true } as never)
+      if (loc.zoom !== undefined) rightMap.setZoom(loc.zoom, { animate: true } as never)
+      if (loc.pitch !== undefined) rightMap.setPitch(loc.pitch, { animate: true } as never)
+      if (loc.rotation !== undefined) rightMap.setRotation(loc.rotation, { animate: true } as never)
+    }
+    setLocationOpen(false)
+  }
+
+  // Закрытие дропдауна по клику вне
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (locationRef.current && !locationRef.current.contains(e.target as Node)) {
+        setLocationOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [])
+
   return (
     <>
       {showWelcome && (
@@ -343,55 +420,69 @@ function App() {
       )}
       {state && (
         <>
-        <button className="settings-button" onClick={() => setShowWelcome(true)} title="Настройки">
-          ⚙ Настройки
-        </button>
-        <ModeSelector mode={mode} onChange={handleModeChange} />
-        <button className="fps-test-button" onClick={() => setFpsTestOpen(true)} disabled={testRunning}>
-          ▶ Тест FPS
-        </button>
-        <FpsTestDialog
-          open={fpsTestOpen}
-          onClose={() => setFpsTestOpen(false)}
-          onStart={handleStartFpsTest}
-        />
-        <TestResultsDialog
-          open={showResults}
-          onClose={() => setShowResults(false)}
-          leftResults={testResults.left}
-          rightResults={testResults.right}
-          meta={testMeta}
-        />
-        {testRunning && (
-          <div className="test-progress-overlay">
-            <div className="test-progress-box">
-              <div className="test-progress-spinner" />
-              <span className="test-progress-text">{testProgress}</span>
+          <button className="settings-button" onClick={() => setShowWelcome(true)} title="Настройки">
+            ⚙ Настройки
+          </button>
+          <ModeSelector mode={mode} onChange={handleModeChange} />
+          <div className="location-picker" ref={locationRef}>
+            <button className="location-button" onClick={() => setLocationOpen(v => !v)} title="Выбрать локацию">
+              📍 Локация
+            </button>
+            {locationOpen && (
+              <div className="location-dropdown">
+                {LOCATIONS.map(loc => (
+                  <button key={loc.label} className="location-option" onClick={() => handleLocationSelect(loc)}>
+                    {loc.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <button className="fps-test-button" onClick={() => setFpsTestOpen(true)} disabled={testRunning}>
+            ▶ Тест FPS
+          </button>
+          <FpsTestDialog
+            open={fpsTestOpen}
+            onClose={() => setFpsTestOpen(false)}
+            onStart={handleStartFpsTest}
+          />
+          <TestResultsDialog
+            open={showResults}
+            onClose={() => setShowResults(false)}
+            leftResults={testResults.left}
+            rightResults={testResults.right}
+            meta={testMeta}
+          />
+          {testRunning && (
+            <div className="test-progress-overlay">
+              <div className="test-progress-box">
+                <div className="test-progress-spinner" />
+                <span className="test-progress-text">{testProgress}</span>
+              </div>
+            </div>
+          )}
+          <div className="split-container">
+            <div className={`left-half ${isSingleRight ? 'hidden' : ''} ${isSingleLeft ? 'full' : ''}`}>
+              <Map
+                ref={leftMapRef}
+                apiKey={state.apiKey}
+                options={state.leftOptions}
+                engineUrl={state.leftUrl || undefined}
+                styleId={state.styleId}
+                onReady={handleLeftReady}
+              />
+            </div>
+            <div className={`right-half ${isSingleLeft ? 'hidden' : ''} ${isSingleRight ? 'full' : ''}`}>
+              <Map
+                ref={rightMapRef}
+                apiKey={state.apiKey}
+                options={state.rightOptions}
+                engineUrl={state.rightUrl || undefined}
+                styleId={state.styleId}
+                onReady={handleRightReady}
+              />
             </div>
           </div>
-        )}
-        <div className="split-container">
-          <div className={`left-half ${isSingleRight ? 'hidden' : ''} ${isSingleLeft ? 'full' : ''}`}>
-            <Map
-              ref={leftMapRef}
-              apiKey={state.apiKey}
-              options={state.leftOptions}
-              engineUrl={state.leftUrl || undefined}
-              styleId={state.styleId}
-              onReady={handleLeftReady}
-            />
-          </div>
-          <div className={`right-half ${isSingleLeft ? 'hidden' : ''} ${isSingleRight ? 'full' : ''}`}>
-            <Map
-              ref={rightMapRef}
-              apiKey={state.apiKey}
-              options={state.rightOptions}
-              engineUrl={state.rightUrl || undefined}
-              styleId={state.styleId}
-              onReady={handleRightReady}
-            />
-          </div>
-        </div>
         </>
       )}
     </>

@@ -1,7 +1,7 @@
 
 import type { AnimationOptions, Map } from "@2gis/mapgl/types";
 
-function sleep(time:any) {
+function sleep(time: any) {
     return new Promise((resolve) => {
         setTimeout(resolve, time);
     });
@@ -69,6 +69,24 @@ export async function runScenario(map: Map, name: string, speedMultiplier = 1) {
         }
     }
 }
+
+const city = [[
+    { center: [37.53845987671461, 55.74797546907836], duration: 0, },
+    { zoom: 16.25, pitch: 45, rotation: -125, duration: 0, },
+], [
+    { center: [37.53845987671461, 55.74797546907836], duration: 0, },
+    { zoom: 16.25, pitch: 45, rotation: -120, duration: 30, },
+], [
+    { center: [37.53845987671461, 55.74797546907836], duration: 0, },
+    { zoom: 16.25, pitch: 45, rotation: -130, duration: 60, },
+], [{ center: [37.53845987671461, 55.74797546907836], duration: 0, },
+{ zoom: 16.25, pitch: 45, rotation: -125, duration: 30, },
+]].reduce((res, scenario) => {
+    scenario.forEach((viewRequest) =>
+        res.push({ ...viewRequest, duration: viewRequest.duration * 100 }),
+    );
+    return res;
+}, []);
 
 const vdnh = [
     // Москва, ВДНХ. 
@@ -231,4 +249,4 @@ const moscow = [
     return res;
 }, []);
 
-export const scenarios:any = { "Москва малый": easy, "Москва большой": moscow, "ВДНХ": vdnh }
+export const scenarios: any = { "ВДНХ": vdnh, "МоскваСити": city, "Москва малый": easy, }

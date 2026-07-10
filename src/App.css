@@ -25,7 +25,7 @@ html, body {
 
 .left-half {
   flex: 1;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid #e33;
   overflow: hidden;
   transition: flex 0.3s ease;
 }
@@ -46,6 +46,70 @@ html, body {
 .right-half.full {
   flex: 1;
   border: none;
+}
+
+.location-picker {
+  position: fixed;
+  top: 12px;
+  right: 150px;
+  z-index: 600;
+}
+
+.location-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  color: #ccc;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.location-button:hover {
+  background: rgba(170, 59, 255, 0.3);
+  border-color: #aa3bff;
+  color: #fff;
+}
+
+.location-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.location-option {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: #ccc;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.location-option:hover {
+  background: rgba(170, 59, 255, 0.25);
+  color: #fff;
 }
 
 .fps-test-button {
