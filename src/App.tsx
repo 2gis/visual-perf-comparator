@@ -9,6 +9,19 @@ import TestResultsDialog, { type TestMeta } from './TestResultsDialog'
 import { measureRender, type TestResults } from './tests/measureRender'
 import { DEFAULT_STYLE_ID, STORAGE_KEYS } from './constants'
 
+interface Preset {
+  name: string
+  style: string
+  left: {
+    mapglUrl: string
+    options: MapOptions
+  }
+  right: {
+    mapglUrl: string
+    options: MapOptions
+  }
+}
+
 interface LocationPreset {
   label: string
   center: [number, number]
@@ -17,6 +30,269 @@ interface LocationPreset {
   rotation?: number
 }
 
+const PRESETS: Preset[] = [{
+  name: "MSAA vs TAA",
+  style: "eb10e2c3-3c28-4b81-b74b-859c9c4cf47e",
+  left: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "msaa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  },
+  right: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "taa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  }
+},
+{
+  name: "FXAA vs TAA",
+  style: "eb10e2c3-3c28-4b81-b74b-859c9c4cf47e",
+  left: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "fxaa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  },
+  right: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "taa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  }
+},
+{
+  name: "SMAA vs TAA",
+  style: "eb10e2c3-3c28-4b81-b74b-859c9c4cf47e",
+  left: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "smaa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  },
+  right: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "taa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  }
+},
+{
+  name: "MSAA vs SMAA",
+  style: "eb10e2c3-3c28-4b81-b74b-859c9c4cf47e",
+  left: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "msaa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  },
+  right: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "smaa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  }
+},
+
+
+{
+  name: "MSAA downaScaler:Auto vs TAA",
+  style: "eb10e2c3-3c28-4b81-b74b-859c9c4cf47e",
+  left: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "msaa",
+      "downscaler": "auto",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  },
+  right: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "taa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  }
+},
+{
+  name: "FXAA downaScaler:Auto vs TAA",
+  style: "eb10e2c3-3c28-4b81-b74b-859c9c4cf47e",
+  left: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "fxaa",
+      "downscaler": "auto",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  },
+  right: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "taa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  }
+},
+{
+  name: "SMAA downaScaler:Auto vs TAA",
+  style: "eb10e2c3-3c28-4b81-b74b-859c9c4cf47e",
+  left: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "smaa",
+      "downscaler": "auto",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  },
+  right: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "taa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  }
+},
+{
+  name: "TAA downaScaler:Auto vs TAA",
+  style: "eb10e2c3-3c28-4b81-b74b-859c9c4cf47e",
+  left: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "taa",
+      "downscaler": "auto",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  },
+  right: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "taa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  }
+},
+{
+  name: "SMAA downaScaler:Auto vs SMAA",
+  style: "eb10e2c3-3c28-4b81-b74b-859c9c4cf47e",
+  left: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "smaa",
+      "downscaler": "auto",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  },
+  right: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "smaa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  }
+},
+{
+  name: "MSAA downaScaler:Auto vs MSAA",
+  style: "eb10e2c3-3c28-4b81-b74b-859c9c4cf47e",
+  left: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "msaa",
+      "downscaler": "auto",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  },
+  right: {
+    mapglUrl: "https://mapgl.2gis.com/api/js/v0.0.409",
+    options: {
+      "zoom": 18,
+      "antiAliasingMode": "msaa",
+      "downscaler": "none",
+      "styleState": {
+        "immersiveRoadsOn": true
+      }
+    }
+  }
+},
+]
 const LOCATIONS: LocationPreset[] = [
   {
     label: 'ВДНХ - вход',
@@ -134,7 +410,7 @@ function App() {
     styleId: urlConfig.current.styleId,
   } : null)
 
-  const [mode, setMode] = useState<Mode>(urlConfig.current?.mode ?? 'side-by-side')
+  const [mode, setMode] = useState<Mode>(urlConfig.current?.mode ?? 'split')
   const [showWelcome, setShowWelcome] = useState(!urlConfig.current)
   const [fpsTestOpen, setFpsTestOpen] = useState(false)
   const [testRunning, setTestRunning] = useState(false)
@@ -146,8 +422,10 @@ function App() {
   const [testMeta, setTestMeta] = useState<TestMeta | null>(null)
   const [showResults, setShowResults] = useState(false)
   const [locationOpen, setLocationOpen] = useState(false)
+  const [presetOpen, setPresetOpen] = useState(false)
   const locationRef = useRef<HTMLDivElement>(null)
-  const prevMode = useRef<Mode>('side-by-side')
+  const presetRef = useRef<HTMLDivElement>(null)
+  const prevMode = useRef<Mode>('split')
 
   const leftMapRef = useRef<MapHandle>(null)
   const rightMapRef = useRef<MapHandle>(null)
@@ -367,6 +645,27 @@ function App() {
     }
   }
 
+  const handlePresetSelect = (preset: Preset) => {
+    localStorage.setItem(STORAGE_KEYS.leftOptions, JSON.stringify(preset.left.options))
+    localStorage.setItem(STORAGE_KEYS.rightOptions, JSON.stringify(preset.right.options))
+    localStorage.setItem(STORAGE_KEYS.leftUrl, preset.left.mapglUrl)
+    localStorage.setItem(STORAGE_KEYS.rightUrl, preset.right.mapglUrl)
+    localStorage.setItem(STORAGE_KEYS.styleId, preset.style)
+    if (state) {
+      localStorage.setItem(STORAGE_KEYS.apiKey, state.apiKey)
+      updateUrlConfig({
+        ...state,
+        leftOptions: preset.left.options,
+        rightOptions: preset.right.options,
+        leftUrl: preset.left.mapglUrl,
+        rightUrl: preset.right.mapglUrl,
+        styleId: preset.style,
+        mode,
+      })
+    }
+    window.location.reload()
+  }
+
   const handleLocationSelect = (loc: LocationPreset) => {
     const leftMap = leftMapRef.current?.getMap()
     const rightMap = rightMapRef.current?.getMap()
@@ -386,11 +685,14 @@ function App() {
     setLocationOpen(false)
   }
 
-  // Закрытие дропдауна по клику вне
+  // Закрытие дропдаунов по клику вне
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (locationRef.current && !locationRef.current.contains(e.target as Node)) {
         setLocationOpen(false)
+      }
+      if (presetRef.current && !presetRef.current.contains(e.target as Node)) {
+        setPresetOpen(false)
       }
     }
     document.addEventListener('mousedown', onClick)
@@ -402,6 +704,7 @@ function App() {
       {showWelcome && (
         <Welcome
           onSubmit={handleSubmit}
+          onClose={state ? () => setShowWelcome(false) : undefined}
           initialKey={localStorage.getItem(STORAGE_KEYS.apiKey) ?? ''}
           initialLeftOptions={safeParse(
             localStorage.getItem(STORAGE_KEYS.leftOptions),
@@ -423,6 +726,20 @@ function App() {
           <button className="settings-button" onClick={() => setShowWelcome(true)} title="Настройки">
             ⚙ Настройки
           </button>
+          <div className="preset-picker" ref={presetRef}>
+            <button className="preset-button" onClick={() => setPresetOpen(v => !v)} title="Выбрать пресет">
+              📋 Пресеты
+            </button>
+            {presetOpen && (
+              <div className="preset-dropdown">
+                {PRESETS.map((preset, i) => (
+                  <button key={i} className="preset-option" onClick={() => handlePresetSelect(preset)}>
+                    {preset.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <ModeSelector mode={mode} onChange={handleModeChange} />
           <div className="location-picker" ref={locationRef}>
             <button className="location-button" onClick={() => setLocationOpen(v => !v)} title="Выбрать локацию">

@@ -25,6 +25,7 @@ interface WelcomeProps {
     rightUrl: string,
     styleId: string
   ) => void
+  onClose?: () => void
   initialKey?: string
   initialLeftOptions?: MapOptions
   initialRightOptions?: MapOptions
@@ -35,6 +36,7 @@ interface WelcomeProps {
 
 function Welcome({
   onSubmit,
+  onClose,
   initialKey = '',
   initialLeftOptions = EMPTY_OPTIONS,
   initialRightOptions = EMPTY_OPTIONS,
@@ -94,6 +96,11 @@ function Welcome({
   return (
     <div className={`welcome-overlay ${visible ? 'visible' : ''}`}>
       <div className="welcome-window">
+        {onClose && (
+          <button className="welcome-close" onClick={onClose} title="Закрыть">
+            ✕
+          </button>
+        )}
         <h1 className="welcome-title">Добро пожаловать!</h1>
         <p className="welcome-text">
           Visual Perf Comparator — приложение для сравнения визуализации карт.
