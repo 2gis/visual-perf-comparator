@@ -393,7 +393,7 @@ function safeParse(value: string | null, fallback: MapOptions): MapOptions {
 }
 
 function App() {
-  console.log('visual-perf-comparator v.0.8.2')
+  console.log('visual-perf-comparator v.0.8.4')
   const urlConfig = useRef(getUrlConfig())
 
   const [state] = useState<{
@@ -592,6 +592,12 @@ function App() {
 
     setTestResults({ left: leftResults, right: rightResults })
     setTestRunning(false)
+
+    // Сохраняем координаты правой карты (последняя активная) для синхронизации
+    const finalMap = rightMapRef.current?.getMap()
+    if (finalMap) saveCameraFromMap(finalMap)
+    needRestoreCamera.current = 'left'
+
     setMode(prevMode.current)
     setShowResults(true)
   }
@@ -684,18 +690,17 @@ function App() {
 
     const leftMap = leftMapRef.current?.getMap() ?? null
     const rightMap = rightMapRef.current?.getMap() ?? null
-    if (!leftMap || !rightMap) return
 
     const applyPadding = () => {
       const containerWidth = window.innerWidth / 2
       const halfWidth = Math.floor(containerWidth)
 
-      if (mode === 'split') {
+      if (mode === 'split' && leftMap && rightMap) {
         leftMap.setPadding({ top: 0, bottom: 0, right: 0, left: halfWidth }, { animate: false } as never)
         rightMap.setPadding({ top: 0, bottom: 0, right: halfWidth, left: 0 }, { animate: false } as never)
       } else {
-        leftMap.setPadding({ top: 0, bottom: 0, left: 0, right: 0 }, { animate: false } as never)
-        rightMap.setPadding({ top: 0, bottom: 0, left: 0, right: 0 }, { animate: false } as never)
+        if (leftMap) leftMap.setPadding({ top: 0, bottom: 0, left: 0, right: 0 }, { animate: false } as never)
+        if (rightMap) rightMap.setPadding({ top: 0, bottom: 0, left: 0, right: 0 }, { animate: false } as never)
       }
     }
 
