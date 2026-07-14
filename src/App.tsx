@@ -393,7 +393,7 @@ function safeParse(value: string | null, fallback: MapOptions): MapOptions {
 }
 
 function App() {
-  console.log('visual-perf-comparator v.0.8.1')
+  console.log('visual-perf-comparator v.0.8.2')
   const urlConfig = useRef(getUrlConfig())
 
   const [state] = useState<{
@@ -442,6 +442,10 @@ function App() {
     mapRef: React.RefObject<MapHandle | null>,
     readyRef: React.MutableRefObject<number>
   ): Promise<MapGL> => {
+    // Если карта уже существует и готова — возвращаем сразу
+    const existing = mapRef.current?.getMap()
+    if (existing) return existing
+
     const targetMapsReady = readyRef.current + 1
     while (true) {
       const map = mapRef.current?.getMap()
