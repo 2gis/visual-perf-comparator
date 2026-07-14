@@ -393,7 +393,7 @@ function safeParse(value: string | null, fallback: MapOptions): MapOptions {
 }
 
 function App() {
-  console.log('visual-perf-comparator v.0.8')
+  console.log('visual-perf-comparator v.0.8.1')
   const urlConfig = useRef(getUrlConfig())
 
   const [state] = useState<{
@@ -431,8 +431,26 @@ function App() {
 
   const leftMapRef = useRef<MapHandle>(null)
   const rightMapRef = useRef<MapHandle>(null)
+  const mapsReadyRef = useRef(0)
   // Флаг готовности карт
   const [mapsReady, setMapsReady] = useState(0)
+
+  // Синхронизируем ref со state
+  mapsReadyRef.current = mapsReady
+
+  const waitForMap = async (
+    mapRef: React.RefObject<MapHandle | null>,
+    readyRef: React.MutableRefObject<number>
+  ): Promise<MapGL> => {
+    const targetMapsReady = readyRef.current + 1
+    while (true) {
+      const map = mapRef.current?.getMap()
+      if (map && readyRef.current >= targetMapsReady) {
+        return map
+      }
+      await new Promise((r) => setTimeout(r, 50))
+    }
+  }
 
   const needRestoreCamera = useRef<'left' | 'right' | null>(null)
   const savedCamera = useRef<{
@@ -516,10 +534,6 @@ function App() {
   const handleStartFpsTest = async (settings: FpsTestSettings) => {
     if (!state || !mapsReady) return
 
-    const leftMap = leftMapRef.current?.getMap()
-    const rightMap = rightMapRef.current?.getMap()
-    if (!leftMap || !rightMap) return
-
     prevMode.current = mode
     setTestRunning(true)
     setTestResults({ left: null, right: null })
@@ -538,7 +552,10 @@ function App() {
     // Тест левой карты: показываем только левую
     setMode('single-A')
     setTestProgress('Левая карта: подготовка...')
-    await new Promise((r) => setTimeout(r, 500))
+
+    // Ждём, пока левая карта загрузится и станет доступна
+    const leftMap = await waitForMap(leftMapRef, mapsReadyRef)
+    await new Promise((r) => setTimeout(r, 300))
 
     setTestProgress('Левая карта: тест...')
     const leftResults = await measureRender(
@@ -553,7 +570,11 @@ function App() {
     // Тест правой карты: показываем только правую
     setMode('single-B')
     setTestProgress('Правая карта: подготовка...')
-    await new Promise((r) => setTimeout(r, 500))
+
+    // Ждём, пока правая карта загрузится и станет доступна
+    const rightMap = await waitForMap(rightMapRef, mapsReadyRef)
+
+    await new Promise((r) => setTimeout(r, 300))
 
     setTestProgress('Правая карта: тест...')
     const rightResults = await measureRender(
