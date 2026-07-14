@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import './App.css'
 import Map, { type MapHandle } from './Map'
+import type { Map as MapGL } from '@2gis/mapgl/types'
 import Welcome from './Welcome'
 import ModeSelector, { type Mode } from './ModeSelector'
 import FpsTestDialog, { type FpsTestSettings } from './FpsTestDialog'
@@ -392,6 +393,7 @@ function safeParse(value: string | null, fallback: MapOptions): MapOptions {
 }
 
 function App() {
+  console.log('visual-perf-comparator v.0.8')
   const urlConfig = useRef(getUrlConfig())
 
   const [state] = useState<{
@@ -430,10 +432,36 @@ function App() {
   const leftMapRef = useRef<MapHandle>(null)
   const rightMapRef = useRef<MapHandle>(null)
   // Флаг готовности карт
-  const [mapsReady, setMapsReady] = useState(false)
+  const [mapsReady, setMapsReady] = useState(0)
+
+  const needRestoreCamera = useRef<'left' | 'right' | null>(null)
+  const savedCamera = useRef<{
+    center: [number, number]
+    zoom: number
+    pitch: number
+    rotation: number
+  } | null>(null)
+
+  const saveCameraFromMap = (map: MapGL) => {
+    savedCamera.current = {
+      center: map.getCenter() as [number, number],
+      zoom: map.getZoom(),
+      pitch: map.getPitch(),
+      rotation: map.getRotation(),
+    }
+  }
+
+  const restoreCameraToMap = (map: MapGL) => {
+    const cam = savedCamera.current
+    if (!cam) return
+    map.setCenter(cam.center, { animate: false } as never)
+    map.setZoom(cam.zoom, { animate: false } as never)
+    map.setPitch(cam.pitch, { animate: false } as never)
+    map.setRotation(cam.rotation, { animate: false } as never)
+  }
 
   const handleLeftReady = () => {
-    setMapsReady(true)
+    setMapsReady(v => v + 1)
     // Если из URL есть сохранённый view — применяем
     const cfg = urlConfig.current
     if (cfg?.view) {
@@ -445,8 +473,26 @@ function App() {
         map.setRotation(cfg.view.rotation, { animate: false } as never)
       }
     }
+    // Если карта восстанавливается — применяем сохранённые координаты
+    if (needRestoreCamera.current === 'left') {
+      needRestoreCamera.current = null
+      setTimeout(() => {
+        const map = leftMapRef.current?.getMap()
+        if (map) restoreCameraToMap(map)
+      }, 100)
+    }
   }
-  const handleRightReady = () => setMapsReady(true)
+  const handleRightReady = () => {
+    setMapsReady(v => v + 1)
+    // Если карта восстанавливается — применяем сохранённые координаты
+    if (needRestoreCamera.current === 'right') {
+      needRestoreCamera.current = null
+      setTimeout(() => {
+        const map = rightMapRef.current?.getMap()
+        if (map) restoreCameraToMap(map)
+      }, 100)
+    }
+  }
 
   const handleSubmit = (
     apiKey: string,
@@ -558,20 +604,20 @@ function App() {
 
     const onLeftMove = () => {
       if (syncDirection.current !== 'left') return
-      rightMap.triggerRerender();
       rightMap.setCenter(leftMap.getCenter(), { animate: false } as never)
       rightMap.setZoom(leftMap.getZoom(), { animate: false } as never)
       rightMap.setPitch(leftMap.getPitch(), { animate: false } as never)
       rightMap.setRotation(leftMap.getRotation(), { animate: false } as never)
+      rightMap.triggerRerender();
     }
 
     const onRightMove = () => {
       if (syncDirection.current !== 'right') return
-      leftMap.triggerRerender();
       leftMap.setCenter(rightMap.getCenter(), { animate: false } as never)
       leftMap.setZoom(rightMap.getZoom(), { animate: false } as never)
       leftMap.setPitch(rightMap.getPitch(), { animate: false } as never)
       leftMap.setRotation(rightMap.getRotation(), { animate: false } as never)
+      leftMap.triggerRerender();
     }
 
     leftMap.on('move', onLeftMove)
@@ -639,6 +685,29 @@ function App() {
   }, [state, mapsReady, mode])
 
   const handleModeChange = (newMode: Mode) => {
+    // При смене режима, когда одна карта будет демонтирована,
+    // сохраняем координаты активной карты
+    const leftMap = leftMapRef.current?.getMap()
+    const rightMap = rightMapRef.current?.getMap()
+
+    if (mode === 'single-A') {
+      if (leftMap) saveCameraFromMap(leftMap)
+    }
+    if (mode === 'single-B') {
+      if (rightMap) saveCameraFromMap(rightMap)
+    }
+
+    // Указываем, какую карту нужно восстановить после монтирования
+    if (mode === 'single-A' && newMode !== 'single-A') {
+      needRestoreCamera.current = 'right'
+    } else if (mode === 'single-B' && newMode !== 'single-B') {
+      needRestoreCamera.current = 'left'
+    } else if (mode === 'single-A' && newMode === 'single-B') {
+      needRestoreCamera.current = 'right'
+    } else if (mode === 'single-B' && newMode === 'single-A') {
+      needRestoreCamera.current = 'left'
+    }
+
     setMode(newMode)
     if (state) {
       updateUrlConfig({ ...state, mode: newMode })
@@ -780,24 +849,30 @@ function App() {
           )}
           <div className="split-container">
             <div className={`left-half ${isSingleRight ? 'hidden' : ''} ${isSingleLeft ? 'full' : ''}`}>
-              <Map
-                ref={leftMapRef}
-                apiKey={state.apiKey}
-                options={state.leftOptions}
-                engineUrl={state.leftUrl || undefined}
-                styleId={state.styleId}
-                onReady={handleLeftReady}
-              />
+              {!isSingleRight && (
+                <Map
+                  ref={leftMapRef}
+                  apiKey={state.apiKey}
+                  options={state.leftOptions}
+                  engineUrl={state.leftUrl || undefined}
+                  styleId={state.styleId}
+                  onReady={handleLeftReady}
+
+                />
+              )}
             </div>
             <div className={`right-half ${isSingleLeft ? 'hidden' : ''} ${isSingleRight ? 'full' : ''}`}>
-              <Map
-                ref={rightMapRef}
-                apiKey={state.apiKey}
-                options={state.rightOptions}
-                engineUrl={state.rightUrl || undefined}
-                styleId={state.styleId}
-                onReady={handleRightReady}
-              />
+              {!isSingleLeft && (
+                <Map
+                  ref={rightMapRef}
+                  apiKey={state.apiKey}
+                  options={state.rightOptions}
+                  engineUrl={state.rightUrl || undefined}
+                  styleId={state.styleId}
+                  onReady={handleRightReady}
+
+                />
+              )}
             </div>
           </div>
         </>

@@ -20,15 +20,17 @@ interface MapProps {
   engineUrl?: string
   styleId?: string
   onReady?: () => void
+  name?: string,
 }
 
 const Map = forwardRef<MapHandle, MapProps>(
   (
     {
-      apiKey =  '',
+      apiKey = '',
       options = DEFAULT_MAP_OPTIONS,
       engineUrl,
       onReady,
+      name
     },
     ref
   ) => {
@@ -61,8 +63,8 @@ const Map = forwardRef<MapHandle, MapProps>(
           ...mergedOptions,
           key: apiKey || 'a1893935-6834-4445-b97a-3405fb426c5b',
         } as ConstructorParameters<typeof mapglAPI.Map>[1])
-        mapInstanceRef.current = map
-
+        mapInstanceRef.current = map;
+        if (name) { (mapInstanceRef.current as any)._impl.on('framestart', () => console.log(name)) };
         onReady?.()
       })
 
